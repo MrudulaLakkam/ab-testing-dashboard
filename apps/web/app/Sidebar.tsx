@@ -15,11 +15,11 @@ export function Sidebar({ currentPage, setCurrentPage }: {
   ];
 
   return (
-    <aside className="w-64 bg-gray-900 text-white h-screen fixed left-0 top-0 shadow-lg">
+    <aside className="w-64 bg-blue-900 text-white h-screen fixed left-0 top-0 shadow-lg">
       {/* Logo */}
-      <div className="p-6 border-b border-gray-700">
+      <div className="p-6 border-b border-blue-700">
         <h1 className="text-2xl font-bold">AB Test Pro</h1>
-        <p className="text-sm text-gray-400 mt-1">Statistical Testing</p>
+        <p className="text-sm text-blue-300 mt-1">Statistical Testing</p>
       </div>
 
       {/* Menu */}
@@ -31,7 +31,7 @@ export function Sidebar({ currentPage, setCurrentPage }: {
             className={`w-full text-left px-4 py-3 rounded-lg font-semibold transition-colors ${
               currentPage === item.id
                 ? 'bg-blue-600 text-white'
-                : 'text-gray-300 hover:bg-gray-800'
+                : 'text-blue-100 hover:bg-blue-800'
             }`}
           >
             {item.label}
@@ -40,10 +40,10 @@ export function Sidebar({ currentPage, setCurrentPage }: {
       </nav>
 
       {/* Bottom Section */}
-      <div className="absolute bottom-0 w-full border-t border-gray-700 p-4">
-        <div className="bg-gray-800 p-4 rounded-lg">
+      <div className="absolute bottom-0 w-full border-t border-blue-700 p-4">
+        <div className="bg-blue-800 p-4 rounded-lg">
           <p className="text-sm font-semibold mb-2">Pro Tip 💡</p>
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-blue-200">
             Run experiments with at least 100 samples per variant for reliable results.
           </p>
         </div>
