@@ -1,13 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { Navigation } from './Navigation';
+import { Sidebar } from './Sidebar';
+import { Dashboard } from './Dashboard';
 import { ExperimentForm } from './ExperimentForm';
 import { ExperimentsList } from './ExperimentsList';
 import { ExperimentDetail } from './ExperimentDetail';
+import { Analytics } from './Analytics';
 
-function HomePageContent() {
-  const [currentPage, setCurrentPage] = useState('home');
+function HomePage() {
+  const [currentPage, setCurrentPage] = useState('dashboard');
   const [selectedExperimentId, setSelectedExperimentId] = useState<string | null>(null);
 
   const handleSelectExperiment = (id: string) => {
@@ -20,43 +22,42 @@ function HomePageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Navigation */}
-      <Navigation currentPage={currentPage} setCurrentPage={setCurrentPage} />
+    <div className="flex h-screen bg-gray-100">
+      {/* Sidebar */}
+      <Sidebar currentPage={currentPage} setCurrentPage={setCurrentPage} />
 
       {/* Main Content */}
-      <main className="py-12 px-8">
-        {currentPage === 'home' && (
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-5xl font-bold text-gray-900 mb-4">
-                Create & Manage A/B Tests
-              </h2>
-              <p className="text-xl text-gray-600">
-                Run experiments with statistical rigor
-              </p>
-            </div>
-            <ExperimentForm />
-          </div>
-        )}
-
-        {currentPage === 'experiments' && (
-          <div className="bg-white min-h-screen p-8 rounded-lg">
+      <main className="flex-1 ml-64 overflow-auto">
+        <div className="p-8">
+          {currentPage === 'dashboard' && <Dashboard />}
+          
+          {currentPage === 'create' && <ExperimentForm />}
+          
+          {currentPage === 'experiments' && (
             <ExperimentsList onSelectExperiment={handleSelectExperiment} />
-          </div>
-        )}
-
-        {currentPage === 'detail' && selectedExperimentId && (
-          <div className="bg-white min-h-screen p-8 rounded-lg">
+          )}
+          
+          {currentPage === 'detail' && selectedExperimentId && (
             <ExperimentDetail
               experimentId={selectedExperimentId}
               onBack={handleBackFromDetail}
             />
-          </div>
-        )}
+          )}
+          
+          {currentPage === 'analytics' && <Analytics />}
+
+          {currentPage === 'settings' && (
+            <div className="max-w-4xl">
+              <h1 className="text-4xl font-bold text-gray-900 mb-6">Settings</h1>
+              <div className="bg-white p-8 rounded-lg shadow border border-gray-200">
+                <p className="text-gray-600 text-lg">Settings page coming soon...</p>
+              </div>
+            </div>
+          )}
+        </div>
       </main>
     </div>
   );
 }
 
-export default HomePageContent;
+export default HomePage;
