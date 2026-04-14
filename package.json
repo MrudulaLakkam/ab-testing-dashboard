@@ -1,0 +1,1 @@
+{"name":"ab-testing-dashboard","version":"0.1.0","description":"A/B testing","private":true,"workspaces":["apps/*"],"scripts":{"dev":"npm run dev --workspaces"},"license":"MIT"}
