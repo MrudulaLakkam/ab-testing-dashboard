@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { supabase } from './supabaseClient';
 
 export function ExperimentForm() {
   const [formData, setFormData] = useState({
@@ -11,6 +12,8 @@ export function ExperimentForm() {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -20,23 +23,51 @@ export function ExperimentForm() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validation
     if (!formData.name.trim() || !formData.hypothesis.trim()) {
-      alert('Please fill in all fields');
+      setError('Please fill in all fields');
       return;
     }
 
-    console.log('Experiment Created:', formData);
-    setSubmitted(true);
-    
-    // Reset form after 2 seconds
-    setTimeout(() => {
-      setFormData({ name: '', hypothesis: '', variantA: 'Control', variantB: 'Treatment' });
-      setSubmitted(false);
-    }, 2000);
+    setLoading(true);
+    setError('');
+
+    try {
+      // Save experiment to database
+      const { data, error: insertError } = await supabase
+        .from('experiments')
+        .insert([
+          {
+            name: formData.name,
+            hypothesis: formData.hypothesis,
+            variant_a: formData.variantA,
+            variant_b: formData.variantB,
+            status: 'draft',
+          }
+        ])
+        .select();
+
+      if (insertError) {
+        throw insertError;
+      }
+
+      console.log('Experiment created:', data);
+      setSubmitted(true);
+      
+      // Reset form after 2 seconds
+      setTimeout(() => {
+        setFormData({ name: '', hypothesis: '', variantA: 'Control', variantB: 'Treatment' });
+        setSubmitted(false);
+      }, 2000);
+    } catch (err: any) {
+      setError(err.message || 'Failed to create experiment');
+      console.error('Error:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -47,6 +78,13 @@ export function ExperimentForm() {
         <div className="mb-6 p-4 bg-green-100 border border-green-500 rounded-lg">
           <p className="text-green-800 font-semibold">✅ Experiment Created Successfully!</p>
           <p className="text-green-700 text-sm mt-1">Experiment: <strong>{formData.name}</strong></p>
+        </div>
+      )}
+
+      {error && (
+        <div className="mb-6 p-4 bg-red-100 border border-red-500 rounded-lg">
+          <p className="text-red-800 font-semibold">❌ Error</p>
+          <p className="text-red-700 text-sm mt-1">{error}</p>
         </div>
       )}
 
@@ -64,6 +102,7 @@ export function ExperimentForm() {
             onChange={handleChange}
             placeholder="e.g., Homepage Button Color Test"
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={loading}
           />
           <p className="text-xs text-gray-500 mt-1">Give your experiment a descriptive name</p>
         </div>
@@ -80,6 +119,7 @@ export function ExperimentForm() {
             placeholder="e.g., Changing the button color to red will increase click-through rate by 10%"
             rows={4}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={loading}
           />
           <p className="text-xs text-gray-500 mt-1">Describe what you expect to happen and why</p>
         </div>
@@ -96,6 +136,7 @@ export function ExperimentForm() {
             onChange={handleChange}
             placeholder="e.g., Blue Button"
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={loading}
           />
           <p className="text-xs text-gray-500 mt-1">The original version (control group)</p>
         </div>
@@ -112,6 +153,7 @@ export function ExperimentForm() {
             onChange={handleChange}
             placeholder="e.g., Red Button"
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={loading}
           />
           <p className="text-xs text-gray-500 mt-1">The variation to test</p>
         </div>
@@ -119,9 +161,10 @@ export function ExperimentForm() {
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors"
+          disabled={loading}
+          className="w-full px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          Create Experiment
+          {loading ? 'Creating...' : 'Create Experiment'}
         </button>
       </form>
 
