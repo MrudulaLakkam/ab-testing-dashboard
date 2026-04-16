@@ -14,6 +14,7 @@ export function ExperimentForm() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -34,6 +35,7 @@ export function ExperimentForm() {
 
     setLoading(true);
     setError('');
+    setSuccessMessage('');
 
     try {
       // Save experiment to database
@@ -55,13 +57,15 @@ export function ExperimentForm() {
       }
 
       console.log('Experiment created:', data);
+      setSuccessMessage(`✅ Experiment "${formData.name}" created successfully!`);
       setSubmitted(true);
       
-      // Reset form after 2 seconds
+      // Reset form after 3 seconds
       setTimeout(() => {
         setFormData({ name: '', hypothesis: '', variantA: 'Control', variantB: 'Treatment' });
         setSubmitted(false);
-      }, 2000);
+        setSuccessMessage('');
+      }, 3000);
     } catch (err: any) {
       setError(err.message || 'Failed to create experiment');
       console.error('Error:', err);
@@ -74,15 +78,14 @@ export function ExperimentForm() {
     <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg border border-gray-200">
       <h2 className="text-3xl font-bold mb-6 text-gray-800">Create New Experiment</h2>
       
-      {submitted && (
-        <div className="mb-6 p-4 bg-green-100 border border-green-500 rounded-lg">
-          <p className="text-green-800 font-semibold">✅ Experiment Created Successfully!</p>
-          <p className="text-green-700 text-sm mt-1">Experiment: <strong>{formData.name}</strong></p>
+      {successMessage && (
+        <div className="mb-6 p-4 bg-green-100 border-2 border-green-500 rounded-lg animate-pulse">
+          <p className="text-green-800 font-bold text-lg">{successMessage}</p>
         </div>
       )}
 
       {error && (
-        <div className="mb-6 p-4 bg-red-100 border border-red-500 rounded-lg">
+        <div className="mb-6 p-4 bg-red-100 border-2 border-red-500 rounded-lg">
           <p className="text-red-800 font-semibold">❌ Error</p>
           <p className="text-red-700 text-sm mt-1">{error}</p>
         </div>
