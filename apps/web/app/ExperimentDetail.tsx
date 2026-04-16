@@ -10,7 +10,7 @@ interface ExperimentData {
   hypothesis: string;
   variant_a: string;
   variant_b: string;
-  status: string;
+  status: 'draft' | 'active' | 'completed';
   created_at: string;
 }
 
