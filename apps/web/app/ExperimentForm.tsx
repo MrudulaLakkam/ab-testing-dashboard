@@ -78,12 +78,6 @@ export function ExperimentForm() {
     <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg border border-gray-200">
       <h2 className="text-3xl font-bold mb-6 text-gray-800">Create New Experiment</h2>
       
-      {successMessage && (
-        <div className="mb-6 p-4 bg-green-100 border-2 border-green-500 rounded-lg animate-pulse">
-          <p className="text-green-800 font-bold text-lg">{successMessage}</p>
-        </div>
-      )}
-
       {error && (
         <div className="mb-6 p-4 bg-red-100 border-2 border-red-500 rounded-lg">
           <p className="text-red-800 font-semibold">❌ Error</p>
@@ -170,6 +164,13 @@ export function ExperimentForm() {
           {loading ? 'Creating...' : 'Create Experiment'}
         </button>
       </form>
+
+      {/* Success Message - Below Button */}
+      {successMessage && (
+        <div className="mt-6 p-4 bg-green-100 border-2 border-green-500 rounded-lg animate-pulse">
+          <p className="text-green-800 font-bold text-lg text-center">{successMessage}</p>
+        </div>
+      )}
 
       {/* Form Preview */}
       <div className="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
