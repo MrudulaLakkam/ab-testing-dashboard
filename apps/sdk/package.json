@@ -1,0 +1,17 @@
+{
+  "name": "@ab-testing/sdk",
+  "version": "1.0.0",
+  "description": "JavaScript SDK for A/B Testing Dashboard",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "keywords": ["ab-testing", "analytics", "experiments"],
+  "author": "AB Test Pro",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
