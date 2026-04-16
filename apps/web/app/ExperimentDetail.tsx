@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import { EditExperimentModal } from './EditExperimentModal';
+import { calculateStatistics } from './statisticsEngine';
 
 interface ExperimentData {
   id: string;
@@ -23,10 +24,23 @@ export function ExperimentDetail({ experimentId, onBack }: {
   const [error, setError] = useState('');
   const [showEditModal, setShowEditModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [stats, setStats] = useState<any>(null);
 
   useEffect(() => {
     fetchExperiment();
   }, [experimentId]);
+
+  useEffect(() => {
+    if (experiment) {
+      const results = calculateStatistics(
+        2543, // Sample size A
+        512,  // Conversions A
+        2457, // Sample size B
+        589   // Conversions B
+      );
+      setStats(results);
+    }
+  }, [experiment]);
 
   const fetchExperiment = async () => {
     setLoading(true);
@@ -207,25 +221,77 @@ export function ExperimentDetail({ experimentId, onBack }: {
       <div className="bg-white p-8 rounded-lg shadow border border-gray-200">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Statistical Analysis</h2>
         
-        <div className="grid grid-cols-3 gap-6">
-          <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <p className="text-sm text-gray-600 font-semibold">Lift</p>
-            <p className="text-3xl font-bold text-blue-600">+19.0%</p>
-            <p className="text-xs text-gray-500 mt-1">Variant B outperforms A</p>
-          </div>
+        {stats ? (
+          <div className="space-y-8">
+            {/* Key Metrics */}
+            <div className="grid grid-cols-3 gap-6">
+              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-sm text-gray-600 font-semibold">Lift</p>
+                <p className="text-3xl font-bold text-blue-600">{stats.liftPercentage > 0 ? '+' : ''}{stats.liftPercentage}%</p>
+                <p className="text-xs text-gray-500 mt-1">Variant B vs A</p>
+              </div>
 
-          <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <p className="text-sm text-gray-600 font-semibold">Confidence Level</p>
-            <p className="text-3xl font-bold text-blue-600">94.2%</p>
-            <p className="text-xs text-gray-500 mt-1">Statistical significance</p>
-          </div>
+              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-sm text-gray-600 font-semibold">Confidence Level</p>
+                <p className="text-3xl font-bold text-blue-600">{stats.confidenceLevel}%</p>
+                <p className="text-xs text-gray-500 mt-1">Statistical significance</p>
+              </div>
 
-          <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-            <p className="text-sm text-gray-600 font-semibold">Status</p>
-            <p className="text-3xl font-bold text-green-600">✓</p>
-            <p className="text-xs text-gray-500 mt-1">Variant B is winner</p>
+              <div className={`p-4 rounded-lg border ${
+                stats.winner === 'B' ? 'bg-green-50 border-green-200' :
+                stats.winner === 'A' ? 'bg-orange-50 border-orange-200' :
+                'bg-gray-50 border-gray-200'
+              }`}>
+                <p className="text-sm text-gray-600 font-semibold">Winner</p>
+                <p className={`text-3xl font-bold ${
+                  stats.winner === 'B' ? 'text-green-600' :
+                  stats.winner === 'A' ? 'text-orange-600' :
+                  'text-gray-600'
+                }`}>
+                  {stats.winner === 'none' ? 'TBD' : `Variant ${stats.winner}`}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {stats.isSignificant ? '✓ Significant' : 'Not yet significant'}
+                </p>
+              </div>
+            </div>
+
+            {/* Detailed Stats */}
+            <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+              <h3 className="font-semibold text-gray-800 mb-4">Detailed Statistics</h3>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-gray-600">Chi-Square Value:</p>
+                  <p className="font-semibold text-gray-900">{stats.chiSquare}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600">P-Value:</p>
+                  <p className="font-semibold text-gray-900">{stats.pValue}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600">Conversion Rate A:</p>
+                  <p className="font-semibold text-gray-900">{stats.variantA.conversionRate}%</p>
+                </div>
+                <div>
+                  <p className="text-gray-600">Conversion Rate B:</p>
+                  <p className="font-semibold text-gray-900">{stats.variantB.conversionRate}%</p>
+                </div>
+                <div>
+                  <p className="text-gray-600">Recommended Sample Size:</p>
+                  <p className="font-semibold text-gray-900">{stats.recommendedSampleSize.toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600">Status:</p>
+                  <p className="font-semibold text-gray-900">
+                    {stats.isSignificant ? '✓ Significant' : 'Not Significant'}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        ) : (
+          <p className="text-gray-600">Loading statistics...</p>
+        )}
       </div>
 
       {/* Edit Modal */}
