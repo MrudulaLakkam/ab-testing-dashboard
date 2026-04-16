@@ -1,13 +1,78 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import { supabase } from './supabaseClient';
+
 export function Dashboard() {
-  // Mock stats
-  const stats = [
-    { label: 'Active Experiments', value: '3', color: 'bg-blue-500' },
-    { label: 'Total Conversions', value: '1,101', color: 'bg-green-500' },
-    { label: 'Avg Conversion Rate', value: '21.8%', color: 'bg-purple-500' },
-    { label: 'Winners Found', value: '1', color: 'bg-orange-500' },
-  ];
+  const [stats, setStats] = useState({
+    activeExperiments: 0,
+    totalConversions: 0,
+    avgConversionRate: 0,
+    winnersFound: 0,
+  });
+  const [experiments, setExperiments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        console.log('Fetching dashboard stats...');
+        
+        // Fetch all experiments
+        const { data: experimentsData, error: experimentsError } = await supabase
+          .from('experiments')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(5); // Get last 5 for recent activity
+
+        if (experimentsError) throw experimentsError;
+
+        // Calculate stats
+        const activeCount = experimentsData?.filter(e => e.status === 'active').length || 0;
+        const completedCount = experimentsData?.filter(e => e.status === 'completed').length || 0;
+        const totalCount = experimentsData?.length || 0;
+
+        console.log('Stats calculated:', {
+          activeExperiments: activeCount,
+          totalExperiments: totalCount,
+          completed: completedCount,
+        });
+
+        setStats({
+          activeExperiments: activeCount,
+          totalConversions: totalCount * 300, // Mock calculation
+          avgConversionRate: 21.8,
+          winnersFound: completedCount,
+        });
+
+        setExperiments(experimentsData || []);
+      } catch (err) {
+        console.error('Error fetching stats:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+const statCards = [
+  { label: 'Active Experiments', value: stats.activeExperiments, color: 'bg-blue-500' },
+  { label: 'Total Experiments', value: experiments.length, color: 'bg-green-500' },
+  { label: 'Avg Conversion Rate', value: `${stats.avgConversionRate}%`, color: 'bg-purple-500' },
+  { label: 'Winners Found', value: stats.winnersFound, color: 'bg-orange-500' },
+];
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-12">
+          <h1 className="text-5xl font-bold text-gray-900 mb-2">Welcome Back! 👋</h1>
+          <p className="text-xl text-gray-600">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -19,7 +84,7 @@ export function Dashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-4 gap-6 mb-12">
-        {stats.map((stat, index) => (
+        {statCards.map((stat, index) => (
           <div
             key={index}
             className="bg-white p-6 rounded-lg shadow border border-gray-200 hover:shadow-lg transition-shadow"
@@ -53,30 +118,30 @@ export function Dashboard() {
       <div className="bg-white p-8 rounded-lg shadow border border-gray-200">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Recent Activity</h2>
         
-        <div className="space-y-4">
-          {[
-            { experiment: 'Button Color Test', status: 'Running', time: '2 hours ago' },
-            { experiment: 'Homepage Headline', status: 'Completed', time: '1 day ago' },
-            { experiment: 'Email Subject Line', status: 'Draft', time: '2 days ago' },
-          ].map((activity, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
-            >
-              <div>
-                <p className="font-semibold text-gray-900">{activity.experiment}</p>
-                <p className="text-sm text-gray-600">{activity.time}</p>
+        {experiments.length === 0 ? (
+          <p className="text-gray-600 text-center py-8">No experiments yet. Create one to get started!</p>
+        ) : (
+          <div className="space-y-4">
+            {experiments.map((experiment) => (
+              <div
+                key={experiment.id}
+                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
+              >
+                <div>
+                  <p className="font-semibold text-gray-900">{experiment.name}</p>
+                  <p className="text-sm text-gray-600">{new Date(experiment.created_at).toLocaleDateString()}</p>
+                </div>
+                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                  experiment.status === 'active' ? 'bg-green-100 text-green-800' :
+                  experiment.status === 'completed' ? 'bg-blue-100 text-blue-800' :
+                  'bg-gray-100 text-gray-800'
+                }`}>
+                  {experiment.status.charAt(0).toUpperCase() + experiment.status.slice(1)}
+                </span>
               </div>
-              <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                activity.status === 'Running' ? 'bg-green-100 text-green-800' :
-                activity.status === 'Completed' ? 'bg-blue-100 text-blue-800' :
-                'bg-gray-100 text-gray-800'
-              }`}>
-                {activity.status}
-              </span>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

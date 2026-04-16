@@ -1,50 +1,51 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from './supabaseClient';
 
 interface Experiment {
   id: string;
   name: string;
   hypothesis: string;
-  variantA: string;
-  variantB: string;
+  variant_a: string;
+  variant_b: string;
   status: 'draft' | 'active' | 'completed';
-  createdAt: string;
+  created_at: string;
 }
 
 export function ExperimentsList({ onSelectExperiment }: {
   onSelectExperiment: (id: string) => void;
 }) {
-  // Mock data - we'll replace this with real data from database later
-  const [experiments] = useState<Experiment[]>([
-    {
-      id: '1',
-      name: 'Button Color Test',
-      hypothesis: 'Red button increases click-through rate by 10%',
-      variantA: 'Blue Button',
-      variantB: 'Red Button',
-      status: 'active',
-      createdAt: '2024-04-10',
-    },
-    {
-      id: '2',
-      name: 'Homepage Headline',
-      hypothesis: 'Shorter headline improves engagement',
-      variantA: 'Original Headline',
-      variantB: 'Shorter Headline',
-      status: 'completed',
-      createdAt: '2024-04-08',
-    },
-    {
-      id: '3',
-      name: 'Email Subject Line',
-      hypothesis: 'Personalized subject increases open rate',
-      variantA: 'Generic Subject',
-      variantB: 'Personalized Subject',
-      status: 'draft',
-      createdAt: '2024-04-12',
-    },
-  ]);
+  const [experiments, setExperiments] = useState<Experiment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  // Fetch experiments from Supabase
+  useEffect(() => {
+    const fetchExperiments = async () => {
+      try {
+        console.log('Fetching experiments from Supabase...');
+        const { data, error: fetchError } = await supabase
+          .from('experiments')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (fetchError) {
+          throw fetchError;
+        }
+
+        console.log('Experiments loaded:', data);
+        setExperiments(data || []);
+      } catch (err: any) {
+        console.error('Error fetching experiments:', err);
+        setError(err.message || 'Failed to load experiments');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchExperiments();
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -59,11 +60,33 @@ export function ExperimentsList({ onSelectExperiment }: {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="max-w-6xl mx-auto">
+        <h2 className="text-4xl font-bold text-gray-800 mb-8">All Experiments</h2>
+        <div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
+          <p className="text-gray-600 text-lg">Loading experiments...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-6xl mx-auto">
+        <h2 className="text-4xl font-bold text-gray-800 mb-8">All Experiments</h2>
+        <div className="text-center py-12 bg-red-50 rounded-lg border border-red-200">
+          <p className="text-red-600 text-lg">Error: {error}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-6xl mx-auto">
       <div className="mb-8">
         <h2 className="text-4xl font-bold text-gray-800 mb-2">All Experiments</h2>
-        <p className="text-gray-600">Track and manage your A/B tests</p>
+        <p className="text-gray-600">Track and manage your A/B tests ({experiments.length} total)</p>
       </div>
 
       {experiments.length === 0 ? (
@@ -95,15 +118,15 @@ export function ExperimentsList({ onSelectExperiment }: {
 
                   <div className="flex gap-6 text-sm text-gray-600 mb-3">
                     <div>
-                      <span className="font-semibold">Variant A:</span> {experiment.variantA}
+                      <span className="font-semibold">Variant A:</span> {experiment.variant_a}
                     </div>
                     <div>
-                      <span className="font-semibold">Variant B:</span> {experiment.variantB}
+                      <span className="font-semibold">Variant B:</span> {experiment.variant_b}
                     </div>
                   </div>
 
                   <p className="text-xs text-gray-500">
-                    Created: {new Date(experiment.createdAt).toLocaleDateString()}
+                    Created: {new Date(experiment.created_at).toLocaleDateString()}
                   </p>
                 </div>
 
