@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
+import { EditExperimentModal } from './EditExperimentModal';
 
 interface ExperimentData {
   id: string;
@@ -20,36 +21,65 @@ export function ExperimentDetail({ experimentId, onBack }: {
   const [experiment, setExperiment] = useState<ExperimentData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    const fetchExperiment = async () => {
-      try {
-        console.log('Fetching experiment:', experimentId);
-        
-        const { data, error: fetchError } = await supabase
-          .from('experiments')
-          .select('*')
-          .eq('id', experimentId)
-          .single();
-
-        if (fetchError) {
-          throw fetchError;
-        }
-
-        console.log('Experiment loaded:', data);
-        setExperiment(data);
-      } catch (err: any) {
-        console.error('Error fetching experiment:', err);
-        setError(err.message || 'Failed to load experiment');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (experimentId) {
-      fetchExperiment();
-    }
+    fetchExperiment();
   }, [experimentId]);
+
+  const fetchExperiment = async () => {
+    setLoading(true);
+    try {
+      console.log('Fetching experiment:', experimentId);
+      
+      const { data, error: fetchError } = await supabase
+        .from('experiments')
+        .select('*')
+        .eq('id', experimentId)
+        .single();
+
+      if (fetchError) {
+        throw fetchError;
+      }
+
+      console.log('Experiment loaded:', data);
+      setExperiment(data);
+      setError('');
+    } catch (err: any) {
+      console.error('Error fetching experiment:', err);
+      setError(err.message || 'Failed to load experiment');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete this experiment? This action cannot be undone.')) {
+      return;
+    }
+
+    setDeleting(true);
+    try {
+      const { error: deleteError } = await supabase
+        .from('experiments')
+        .delete()
+        .eq('id', experimentId);
+
+      if (deleteError) {
+        throw deleteError;
+      }
+
+      console.log('Experiment deleted:', experimentId);
+      alert('Experiment deleted successfully!');
+      onBack();
+    } catch (err: any) {
+      alert('Error deleting experiment: ' + err.message);
+      console.error('Error:', err);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -93,19 +123,36 @@ export function ExperimentDetail({ experimentId, onBack }: {
         ← Back to Experiments
       </button>
 
-      {/* Header */}
+      {/* Header with Actions */}
       <div className="bg-white p-8 rounded-lg shadow border border-gray-200 mb-8">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-4xl font-bold text-gray-900">{experiment.name}</h1>
-          <span className={`px-4 py-2 rounded-full font-semibold ${
-            experiment.status === 'active' ? 'bg-green-100 text-green-800' :
-            experiment.status === 'completed' ? 'bg-blue-100 text-blue-800' :
-            'bg-gray-100 text-gray-800'
-          }`}>
-            {experiment.status.charAt(0).toUpperCase() + experiment.status.slice(1)}
-          </span>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowEditModal(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
+            >
+              ✏️ Edit
+            </button>
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              {deleting ? 'Deleting...' : '🗑️ Delete'}
+            </button>
+          </div>
         </div>
-        <p className="text-gray-700 text-lg">{experiment.hypothesis}</p>
+        
+        <span className={`inline-block px-4 py-2 rounded-full font-semibold mb-4 ${
+          experiment.status === 'active' ? 'bg-green-100 text-green-800' :
+          experiment.status === 'completed' ? 'bg-blue-100 text-blue-800' :
+          'bg-gray-100 text-gray-800'
+        }`}>
+          {experiment.status.charAt(0).toUpperCase() + experiment.status.slice(1)}
+        </span>
+        
+        <p className="text-gray-700 text-lg mt-4">{experiment.hypothesis}</p>
         <p className="text-sm text-gray-500 mt-4">
           Created: {new Date(experiment.created_at).toLocaleDateString()}
         </p>
@@ -180,6 +227,15 @@ export function ExperimentDetail({ experimentId, onBack }: {
           </div>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {showEditModal && experiment && (
+        <EditExperimentModal
+          experiment={experiment}
+          onClose={() => setShowEditModal(false)}
+          onUpdate={fetchExperiment}
+        />
+      )}
     </div>
   );
 }
