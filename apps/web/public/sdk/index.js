@@ -34,23 +34,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             this.sessionId = this.generateSessionId();
             this.init();
         }
-        /**
-         * Initialize the SDK
-         */
         init() {
             this.log('SDK Initialized', {
                 experimentId: this.config.experimentId,
                 userId: this.config.userId,
                 sessionId: this.sessionId,
             });
-            // Track page view
             this.trackView();
-            // Set up automatic event sending
             this.setupEventQueue();
         }
-        /**
-         * Generate unique user ID
-         */
         generateUserId() {
             let userId = localStorage.getItem('ab_test_user_id');
             if (!userId) {
@@ -59,23 +51,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             }
             return userId;
         }
-        /**
-         * Generate unique session ID
-         */
         generateSessionId() {
             return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         }
-        /**
-         * Set up automatic event queue processing
-         */
         setupEventQueue() {
-            // Send events every 5 seconds or when page unloads
             setInterval(() => this.flushEvents(), 5000);
             window.addEventListener('beforeunload', () => this.flushEvents());
         }
-        /**
-         * Track page view
-         */
         trackView() {
             this.trackEvent('view', {
                 url: window.location.href,
@@ -83,21 +65,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 referrer: document.referrer,
             });
         }
-        /**
-         * Track conversion event
-         */
         trackConversion(properties) {
             this.trackEvent('conversion', Object.assign(Object.assign({}, properties), { conversionTime: Date.now() }));
         }
-        /**
-         * Track custom event
-         */
         trackCustomEvent(eventName, properties) {
             this.trackEvent('custom', Object.assign({ eventName }, properties));
         }
-        /**
-         * Track generic event
-         */
         trackEvent(eventType, properties) {
             const event = {
                 experimentId: this.config.experimentId,
@@ -109,32 +82,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             };
             this.eventQueue.push(event);
             this.log(`Event tracked: ${eventType}`, event);
-            // Flush immediately for conversions
             if (eventType === 'conversion') {
                 this.flushEvents();
             }
         }
-        /**
-         * Set variant ID for the user
-         */
         setVariant(variantId) {
             this.variantId = variantId;
             this.log('Variant set', { variantId });
-            // Store in localStorage for persistence
             localStorage.setItem(`ab_test_variant_${this.config.experimentId}`, variantId);
         }
-        /**
-         * Get current variant ID
-         */
         getVariant() {
             if (!this.variantId) {
                 this.variantId = localStorage.getItem(`ab_test_variant_${this.config.experimentId}`);
             }
             return this.variantId;
         }
-        /**
-         * Send events to dashboard
-         */
         flushEvents() {
             return __awaiter(this, void 0, void 0, function* () {
                 if (this.eventQueue.length === 0)
@@ -142,7 +104,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 const events = [...this.eventQueue];
                 this.eventQueue = [];
                 try {
-                    const response = yield fetch(`${this.config.dashboardUrl}/api/events`, {
+                    const apiUrl = `${this.config.dashboardUrl}/api/events`;
+                    this.log('Flushing events', { url: apiUrl, count: events.length });
+                    const response = yield fetch(apiUrl, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -155,26 +119,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
-                    this.log('Events sent successfully', { count: events.length });
+                    const data = yield response.json();
+                    this.log('Events sent successfully', { response: data, count: events.length });
                 }
                 catch (error) {
                     this.log('Error sending events', error);
-                    // Re-queue failed events
                     this.eventQueue = [...events, ...this.eventQueue];
                 }
             });
         }
-        /**
-         * Logging utility
-         */
         log(message, data) {
             if (this.config.debug) {
                 console.log(`[ABTestSDK] ${message}`, data);
             }
         }
-        /**
-         * Get SDK info
-         */
         getInfo() {
             return {
                 version: '1.0.0',
@@ -186,9 +144,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         }
     }
     exports.ABTestSDK = ABTestSDK;
-    // Export for use in browser
-    if (typeof window !== 'undefined') {
-        window.ABTestSDK = ABTestSDK;
-    }
+    // Export for browser
+    window.ABTestSDK = ABTestSDK;
     exports.default = ABTestSDK;
 });

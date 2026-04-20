@@ -22,57 +22,18 @@ declare class ABTestSDK {
     private variantId;
     private eventQueue;
     constructor(config: ABTestConfig);
-    /**
-     * Initialize the SDK
-     */
     private init;
-    /**
-     * Generate unique user ID
-     */
     private generateUserId;
-    /**
-     * Generate unique session ID
-     */
     private generateSessionId;
-    /**
-     * Set up automatic event queue processing
-     */
     private setupEventQueue;
-    /**
-     * Track page view
-     */
     trackView(): void;
-    /**
-     * Track conversion event
-     */
     trackConversion(properties?: Record<string, any>): void;
-    /**
-     * Track custom event
-     */
     trackCustomEvent(eventName: string, properties?: Record<string, any>): void;
-    /**
-     * Track generic event
-     */
     private trackEvent;
-    /**
-     * Set variant ID for the user
-     */
     setVariant(variantId: string): void;
-    /**
-     * Get current variant ID
-     */
     getVariant(): string | null;
-    /**
-     * Send events to dashboard
-     */
     private flushEvents;
-    /**
-     * Logging utility
-     */
     private log;
-    /**
-     * Get SDK info
-     */
     getInfo(): {
         version: string;
         experimentId: string;
