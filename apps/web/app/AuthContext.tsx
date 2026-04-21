@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
 import { User } from './types/auth';
+import { useRouter } from 'next/navigation';
 
 interface AuthContextType {
   user: User | null;
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     checkUser();
@@ -27,14 +29,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: session.user.email || '',
           created_at: session.user.created_at || '',
         });
+        router.push('/');
       } else {
         setUser(null);
+        router.push('/login');
       }
       setLoading(false);
     });
 
     return () => listener?.subscription.unsubscribe();
-  }, []);
+  }, [router]);
 
   const checkUser = async () => {
     try {
@@ -45,7 +49,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: session.user.email || '',
           created_at: session.user.created_at || '',
         });
+      } else {
+        setUser(null);
       }
+    } catch (error) {
+      console.error('Error checking user:', error);
     } finally {
       setLoading(false);
     }
@@ -59,12 +67,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
+    router.push('/');
   };
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
     setUser(null);
+    router.push('/login');
   };
 
   return (
