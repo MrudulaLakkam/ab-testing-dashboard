@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import { EditExperimentModal } from './EditExperimentModal';
 import { calculateStatistics } from './statisticsEngine';
+import { EventsList } from './EventsList';
 
 interface ExperimentData {
   id: string;
@@ -33,10 +34,10 @@ export function ExperimentDetail({ experimentId, onBack }: {
   useEffect(() => {
     if (experiment) {
       const results = calculateStatistics(
-        2543, // Sample size A
-        512,  // Conversions A
-        2457, // Sample size B
-        589   // Conversions B
+        2543,
+        512,
+        2457,
+        589
       );
       setStats(results);
     }
@@ -218,7 +219,7 @@ export function ExperimentDetail({ experimentId, onBack }: {
       </div>
 
       {/* Statistical Results */}
-      <div className="bg-white p-8 rounded-lg shadow border border-gray-200">
+      <div className="bg-white p-8 rounded-lg shadow border border-gray-200 mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Statistical Analysis</h2>
         
         {stats ? (
@@ -293,6 +294,9 @@ export function ExperimentDetail({ experimentId, onBack }: {
           <p className="text-gray-600">Loading statistics...</p>
         )}
       </div>
+
+      {/* Real-Time Events */}
+      <EventsList experimentId={experimentId} />
 
       {/* Edit Modal */}
       {showEditModal && experiment && (

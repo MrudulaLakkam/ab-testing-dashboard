@@ -1,6 +1,5 @@
 /**
  * A/B Testing Dashboard SDK
- * Lightweight JavaScript library for tracking A/B test events
  */
 interface ABTestConfig {
     dashboardUrl: string;
@@ -17,15 +16,14 @@ interface ExperimentEvent {
     timestamp: string;
 }
 declare class ABTestSDK {
-    private config;
-    private sessionId;
-    private variantId;
-    private eventQueue;
+    config: ABTestConfig;
+    sessionId: string;
+    variantId: string | null;
+    eventQueue: ExperimentEvent[];
     constructor(config: ABTestConfig);
     private init;
     private generateUserId;
     private generateSessionId;
-    private setupEventQueue;
     trackView(): void;
     trackConversion(properties?: Record<string, any>): void;
     trackCustomEvent(eventName: string, properties?: Record<string, any>): void;
@@ -39,8 +37,6 @@ declare class ABTestSDK {
         experimentId: string;
         userId: string;
         sessionId: string;
-        variant: string | null;
+        variant: string;
     };
 }
-export default ABTestSDK;
-export { ABTestSDK, ABTestConfig, ExperimentEvent };
