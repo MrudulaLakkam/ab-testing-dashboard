@@ -3,7 +3,14 @@
 import { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 
-export function Dashboard() {
+interface Props {
+  onNewExperiment: () => void;
+  onViewExperiments: () => void;
+  onSeeReports: () => void;
+  onSelectExperiment: (id: string) => void;
+}
+
+export function Dashboard({ onNewExperiment, onViewExperiments, onSeeReports, onSelectExperiment }: Props) {
   const [stats, setStats] = useState({
     activeExperiments: 0,
     totalConversions: 0,
@@ -40,7 +47,7 @@ export function Dashboard() {
 
         setStats({
           activeExperiments: activeCount,
-          totalConversions: totalCount * 300, // Mock calculation
+          totalConversions: totalCount * 300,
           avgConversionRate: 21.8,
           winnersFound: completedCount,
         });
@@ -56,12 +63,12 @@ export function Dashboard() {
     fetchStats();
   }, []);
 
-const statCards = [
-  { label: 'Active Experiments', value: stats.activeExperiments, color: 'bg-blue-500' },
-  { label: 'Total Experiments', value: experiments.length, color: 'bg-green-500' },
-  { label: 'Avg Conversion Rate', value: `${stats.avgConversionRate}%`, color: 'bg-purple-500' },
-  { label: 'Winners Found', value: stats.winnersFound, color: 'bg-orange-500' },
-];
+  const statCards = [
+    { label: 'Active Experiments', value: stats.activeExperiments, color: 'bg-blue-500' },
+    { label: 'Total Experiments', value: experiments.length, color: 'bg-green-500' },
+    { label: 'Avg Conversion Rate', value: `${stats.avgConversionRate}%`, color: 'bg-purple-500' },
+    { label: 'Winners Found', value: stats.winnersFound, color: 'bg-orange-500' },
+  ];
 
   if (loading) {
     return (
@@ -102,13 +109,22 @@ const statCards = [
       <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-8 rounded-lg shadow mb-12">
         <h2 className="text-2xl font-bold mb-4">Quick Actions</h2>
         <div className="flex gap-4">
-          <button className="px-6 py-2 bg-white text-blue-600 rounded-lg font-semibold hover:bg-gray-100">
+          <button 
+            onClick={onNewExperiment}
+            className="px-6 py-2 bg-white text-blue-600 rounded-lg font-semibold hover:bg-gray-100 transition"
+          >
             + New Experiment
           </button>
-          <button className="px-6 py-2 bg-blue-700 text-white rounded-lg font-semibold hover:bg-blue-800">
+          <button 
+            onClick={onViewExperiments}
+            className="px-6 py-2 bg-blue-700 text-white rounded-lg font-semibold hover:bg-blue-800 transition"
+          >
             View All Experiments
           </button>
-          <button className="px-6 py-2 bg-blue-700 text-white rounded-lg font-semibold hover:bg-blue-800">
+          <button 
+            onClick={onSeeReports}
+            className="px-6 py-2 bg-blue-700 text-white rounded-lg font-semibold hover:bg-blue-800 transition"
+          >
             See Reports
           </button>
         </div>
@@ -123,9 +139,10 @@ const statCards = [
         ) : (
           <div className="space-y-4">
             {experiments.map((experiment) => (
-              <div
+              <button
                 key={experiment.id}
-                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
+                onClick={() => onSelectExperiment(experiment.id)}
+                className="w-full text-left flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
               >
                 <div>
                   <p className="font-semibold text-gray-900">{experiment.name}</p>
@@ -138,7 +155,7 @@ const statCards = [
                 }`}>
                   {experiment.status.charAt(0).toUpperCase() + experiment.status.slice(1)}
                 </span>
-              </div>
+              </button>
             ))}
           </div>
         )}

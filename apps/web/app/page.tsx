@@ -29,7 +29,14 @@ function HomePage() {
       {/* Main Content */}
       <main className="flex-1 ml-64 overflow-auto">
         <div className="p-8">
-          {currentPage === 'dashboard' && <Dashboard />}
+          {currentPage === 'dashboard' && (
+            <Dashboard 
+              onNewExperiment={() => setCurrentPage('create')}
+              onViewExperiments={() => setCurrentPage('experiments')}
+              onSeeReports={() => setCurrentPage('analytics')}
+              onSelectExperiment={handleSelectExperiment}
+            />
+          )}
           
           {currentPage === 'create' && <ExperimentForm />}
           
