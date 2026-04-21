@@ -3,7 +3,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
 import { User } from './types/auth';
-import { useRouter } from 'next/navigation';
 
 interface AuthContextType {
   user: User | null;
@@ -15,66 +14,32 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Mock user for now
+const MOCK_USER: User = {
+  id: 'demo-user',
+  email: 'demo@example.com',
+  created_at: new Date().toISOString(),
+};
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
+  const [user, setUser] = useState<User | null>(MOCK_USER);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    checkUser();
-    const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session) {
-        setUser({
-          id: session.user.id,
-          email: session.user.email || '',
-          created_at: session.user.created_at || '',
-        });
-        router.push('/');
-      } else {
-        setUser(null);
-        router.push('/login');
-      }
-      setLoading(false);
-    });
-
-    return () => listener?.subscription.unsubscribe();
-  }, [router]);
-
-  const checkUser = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        setUser({
-          id: session.user.id,
-          email: session.user.email || '',
-          created_at: session.user.created_at || '',
-        });
-      } else {
-        setUser(null);
-      }
-    } catch (error) {
-      console.error('Error checking user:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    // Auth is disabled for now
+    setLoading(false);
+  }, []);
 
   const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({ email, password });
-    if (error) throw error;
+    console.log('Sign up disabled for now');
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
-    router.push('/');
+    console.log('Sign in disabled for now');
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-    setUser(null);
-    router.push('/login');
+    console.log('Sign out disabled for now');
   };
 
   return (
