@@ -5,6 +5,7 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'AB Test Pro',
   description: 'Statistical A/B Testing Platform',
+  viewport: 'width=device-width, initial-scale=1.0',
 };
 
 export default function RootLayout({
