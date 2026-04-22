@@ -75,21 +75,27 @@ export function ExperimentForm() {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg border border-gray-200">
-      <h2 className="text-3xl font-bold mb-6 text-gray-800">Create New Experiment</h2>
-      
+    <div className="max-w-2xl mx-auto px-4 md:px-0">
+      {/* Header */}
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-2">Create New Experiment</h1>
+        <p className="text-gray-600 text-sm md:text-base">Set up a new A/B test to validate your hypothesis</p>
+      </div>
+
+      {/* Error Message */}
       {error && (
-        <div className="mb-6 p-4 bg-red-100 border-2 border-red-500 rounded-lg">
-          <p className="text-red-800 font-semibold">❌ Error</p>
-          <p className="text-red-700 text-sm mt-1">{error}</p>
+        <div className="mb-6 p-3 md:p-4 bg-red-100 border-2 border-red-500 rounded-lg">
+          <p className="text-red-800 font-semibold text-sm md:text-base">❌ Error</p>
+          <p className="text-red-700 text-xs md:text-sm mt-1">{error}</p>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Form Container */}
+      <form onSubmit={handleSubmit} className="bg-white p-4 md:p-8 rounded-lg shadow-lg border border-gray-200 space-y-4 md:space-y-6">
         
         {/* Experiment Name */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm md:text-base font-semibold text-gray-700 mb-2">
             Experiment Name *
           </label>
           <input
@@ -98,7 +104,7 @@ export function ExperimentForm() {
             value={formData.name}
             onChange={handleChange}
             placeholder="e.g., Homepage Button Color Test"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base"
             disabled={loading}
           />
           <p className="text-xs text-gray-500 mt-1">Give your experiment a descriptive name</p>
@@ -106,7 +112,7 @@ export function ExperimentForm() {
 
         {/* Hypothesis */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm md:text-base font-semibold text-gray-700 mb-2">
             Hypothesis *
           </label>
           <textarea
@@ -115,66 +121,69 @@ export function ExperimentForm() {
             onChange={handleChange}
             placeholder="e.g., Changing the button color to red will increase click-through rate by 10%"
             rows={4}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base resize-none"
             disabled={loading}
           />
           <p className="text-xs text-gray-500 mt-1">Describe what you expect to happen and why</p>
         </div>
 
-        {/* Variant A */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Variant A (Control)
-          </label>
-          <input
-            type="text"
-            name="variantA"
-            value={formData.variantA}
-            onChange={handleChange}
-            placeholder="e.g., Blue Button"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            disabled={loading}
-          />
-          <p className="text-xs text-gray-500 mt-1">The original version (control group)</p>
-        </div>
+        {/* Variants - Grid on Desktop, Stack on Mobile */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          {/* Variant A */}
+          <div>
+            <label className="block text-sm md:text-base font-semibold text-gray-700 mb-2">
+              Variant A (Control)
+            </label>
+            <input
+              type="text"
+              name="variantA"
+              value={formData.variantA}
+              onChange={handleChange}
+              placeholder="e.g., Blue Button"
+              className="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base"
+              disabled={loading}
+            />
+            <p className="text-xs text-gray-500 mt-1">The original version (control group)</p>
+          </div>
 
-        {/* Variant B */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Variant B (Treatment)
-          </label>
-          <input
-            type="text"
-            name="variantB"
-            value={formData.variantB}
-            onChange={handleChange}
-            placeholder="e.g., Red Button"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            disabled={loading}
-          />
-          <p className="text-xs text-gray-500 mt-1">The variation to test</p>
+          {/* Variant B */}
+          <div>
+            <label className="block text-sm md:text-base font-semibold text-gray-700 mb-2">
+              Variant B (Treatment)
+            </label>
+            <input
+              type="text"
+              name="variantB"
+              value={formData.variantB}
+              onChange={handleChange}
+              placeholder="e.g., Red Button"
+              className="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base"
+              disabled={loading}
+            />
+            <p className="text-xs text-gray-500 mt-1">The variation to test</p>
+          </div>
         </div>
 
         {/* Submit Button */}
         <button
           type="submit"
           disabled={loading}
-          className="w-full px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+          className="w-full px-4 md:px-6 py-2 md:py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed text-sm md:text-base"
         >
           {loading ? 'Creating...' : 'Create Experiment'}
         </button>
       </form>
 
-      {/* Success Message - Below Button */}
+      {/* Success Message */}
       {successMessage && (
-        <div className="mt-6 p-4 bg-green-100 border-2 border-green-500 rounded-lg animate-pulse">
-          <p className="text-green-800 font-bold text-lg text-center">{successMessage}</p>
+        <div className="mt-6 p-3 md:p-4 bg-green-100 border-2 border-green-500 rounded-lg animate-pulse">
+          <p className="text-green-800 font-bold text-center text-sm md:text-base">{successMessage}</p>
         </div>
       )}
 
-      {/* Form Preview */}
-      <div className="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <h3 className="font-semibold text-gray-800 mb-3">Form Data Preview:</h3>
+      {/* Form Preview - Hidden on Mobile */}
+      <div className="hidden md:block mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <h3 className="font-semibold text-gray-800 mb-3 text-sm md:text-base">Form Data Preview:</h3>
         <pre className="text-xs bg-white p-3 rounded border border-gray-300 overflow-x-auto">
           {JSON.stringify(formData, null, 2)}
         </pre>
