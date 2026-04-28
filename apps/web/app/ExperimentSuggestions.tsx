@@ -58,7 +58,7 @@ export function ExperimentSuggestions() {
   };
 
   if (loading) {
-    return <div className="text-center py-4">🤖 Agent analyzing experiments...</div>;
+    return <div className="text-center py-4 text-sm md:text-base">🤖 Agent analyzing experiments...</div>;
   }
 
   if (!roadmap) {
@@ -69,10 +69,10 @@ export function ExperimentSuggestions() {
     <div className="bg-gradient-to-br from-purple-50 to-blue-50 p-4 md:p-6 rounded-lg shadow border border-purple-200 space-y-4">
       {/* Header */}
       <div className="flex items-start gap-3">
-        <span className="text-3xl">🚀</span>
-        <div className="flex-1">
+        <span className="text-2xl md:text-3xl flex-shrink-0">🚀</span>
+        <div className="flex-1 min-w-0">
           <h3 className="text-lg md:text-xl font-bold text-gray-900">Experiment Agent Recommendations</h3>
-          <p className="text-xs md:text-sm text-gray-600">{roadmap.summary}</p>
+          <p className="text-xs md:text-sm text-gray-600 mt-1">{roadmap.summary}</p>
         </div>
       </div>
 
@@ -100,19 +100,19 @@ export function ExperimentSuggestions() {
               onClick={() => setExpandedIndex(expandedIndex === idx ? null : idx)}
               className="w-full p-3 md:p-4 text-left"
             >
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start justify-between gap-2 md:gap-3">
                 <div className="flex-1 min-w-0">
                   <h4 className="font-semibold text-gray-900 text-sm md:text-base mb-1">
                     {idx + 1}. {suggestion.title}
                   </h4>
-                  <p className="text-xs md:text-sm text-gray-600">{suggestion.description}</p>
+                  <p className="text-xs md:text-sm text-gray-600 line-clamp-2">{suggestion.description}</p>
                 </div>
                 <div className="flex-shrink-0 text-right">
-                  <div className="text-lg md:text-xl font-bold text-green-600 mb-1">
+                  <div className="text-lg md:text-xl font-bold text-green-600 mb-1 whitespace-nowrap">
                     +{suggestion.expectedLift}%
                   </div>
                   <span
-                    className={`inline-block px-2 py-1 rounded text-xs font-semibold ${
+                    className={`inline-block px-2 py-1 rounded text-xs font-semibold whitespace-nowrap ${
                       suggestion.difficulty === 'easy'
                         ? 'bg-green-100 text-green-800'
                         : suggestion.difficulty === 'medium'
@@ -134,14 +134,15 @@ export function ExperimentSuggestions() {
                   <p className="text-xs md:text-sm text-gray-700">{suggestion.hypothesis}</p>
                 </div>
 
+                {/* Metrics Grid - Better Mobile Layout */}
                 <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <p className="text-xs font-semibold text-gray-700">Expected Lift</p>
-                    <p className="text-lg font-bold text-green-600">+{suggestion.expectedLift}%</p>
+                  <div className="bg-white p-3 rounded border border-gray-200">
+                    <p className="text-xs font-semibold text-gray-700 mb-1">Expected Lift</p>
+                    <p className="text-lg md:text-xl font-bold text-green-600">+{suggestion.expectedLift}%</p>
                   </div>
-                  <div>
-                    <p className="text-xs font-semibold text-gray-700">Time to Run</p>
-                    <p className="text-lg font-bold text-blue-600">{suggestion.timeToRun}</p>
+                  <div className="bg-white p-3 rounded border border-gray-200">
+                    <p className="text-xs font-semibold text-gray-700 mb-1">Time to Run</p>
+                    <p className="text-lg md:text-xl font-bold text-blue-600 break-words">{suggestion.timeToRun}</p>
                   </div>
                 </div>
 
@@ -166,7 +167,7 @@ export function ExperimentSuggestions() {
           {roadmap.nextSteps.map((step: string, idx: number) => (
             <li key={idx} className="text-xs md:text-sm text-gray-700 flex gap-2">
               <span className="font-semibold flex-shrink-0">{step.split('.')[0]}.</span>
-              <span>{step.split('.')[1]}</span>
+              <span className="break-words">{step.split('.')[1]}</span>
             </li>
           ))}
         </ul>
