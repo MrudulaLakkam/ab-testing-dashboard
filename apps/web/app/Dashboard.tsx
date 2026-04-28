@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
+import { ExperimentSuggestions } from './ExperimentSuggestions';
 
 interface Experiment {
   id: string;
@@ -69,15 +70,15 @@ export function Dashboard({ onNewExperiment, onViewExperiments, onSeeReports, on
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto px-4 md:px-0">
         <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-2">Welcome Back! 👋</h1>
-        <p className="text-gray-600">Loading your dashboard...</p>
+        <p className="text-gray-600 text-sm md:text-base">Loading your dashboard...</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
+    <div className="max-w-7xl mx-auto px-4 md:px-0 space-y-6 md:space-y-8">
       {/* Welcome Section */}
       <div>
         <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-2">Welcome Back! 👋</h1>
@@ -124,6 +125,9 @@ export function Dashboard({ onNewExperiment, onViewExperiments, onSeeReports, on
           </button>
         </div>
       </div>
+
+      {/* AI Agent Suggestions - NEW! */}
+      <ExperimentSuggestions />
 
       {/* Recent Activity */}
       <div className="bg-white p-6 md:p-8 rounded-lg shadow border border-gray-200">
