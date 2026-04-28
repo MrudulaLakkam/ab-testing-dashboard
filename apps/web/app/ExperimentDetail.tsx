@@ -6,6 +6,7 @@ import { EditExperimentModal } from './EditExperimentModal';
 import { calculateStatistics } from './statisticsEngine';
 import { EventsList } from './EventsList';
 import { ExperimentAdvancedAnalytics } from './ExperimentAdvancedAnalytics';
+import { AgentDashboard } from './AgentDashboard';
 
 interface ExperimentData {
   id: string;
@@ -27,7 +28,7 @@ export function ExperimentDetail({ experimentId, onBack }: {
   const [showEditModal, setShowEditModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [stats, setStats] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'advanced' | 'events'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'agent' | 'advanced' | 'events'>('overview');
 
   useEffect(() => {
     fetchExperiment();
@@ -171,9 +172,10 @@ export function ExperimentDetail({ experimentId, onBack }: {
       <div className="bg-white p-3 md:p-4 rounded-lg shadow border border-gray-200 overflow-x-auto">
         <div className="flex gap-2 whitespace-nowrap">
           {[
-            { id: 'overview', label: 'Overview' },
-            { id: 'advanced', label: 'Advanced Analytics' },
-            { id: 'events', label: 'Events' },
+            { id: 'overview', label: '📊 Overview' },
+            { id: 'agent', label: '🤖 AI Agent' },
+            { id: 'advanced', label: '🚀 Advanced' },
+            { id: 'events', label: '📋 Events' },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -317,6 +319,22 @@ export function ExperimentDetail({ experimentId, onBack }: {
             </div>
           )}
         </>
+      )}
+
+      {/* AI Agent Tab */}
+      {activeTab === 'agent' && stats && (
+        <AgentDashboard
+          experimentId={experimentId}
+          variantA={experiment.variant_a}
+          variantB={experiment.variant_b}
+          sampleA={2543}
+          convA={512}
+          sampleB={2457}
+          convB={589}
+          pValue={stats.pValue}
+          lift={stats.liftPercentage}
+          daysRunning={7}
+        />
       )}
 
       {/* Advanced Analytics Tab */}
