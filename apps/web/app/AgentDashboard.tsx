@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { masterAgent, AgentDecision } from './agentEngine';
+import { masterAgent } from './agentEngine';
 
 interface Props {
   experimentId: string;
@@ -17,12 +17,11 @@ interface Props {
 }
 
 export function AgentDashboard(props: Props) {
-  const [decision, setDecision] = useState<AgentDecision | null>(null);
+  const [decision, setDecision] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'advisor' | 'automation' | 'insights' | 'optimization'>('advisor');
 
   useEffect(() => {
-    // Run agent analysis
     const result = masterAgent({
       id: '',
       name: '',
@@ -84,18 +83,15 @@ export function AgentDashboard(props: Props) {
       {/* ADVISOR AGENT */}
       {activeTab === 'advisor' && (
         <div className="space-y-4">
-          {/* Recommendation Box */}
-          <div
-            className={`p-4 md:p-6 rounded-lg shadow border-2 ${
-              decision.advisor.recommendation.action === 'launch'
-                ? 'bg-green-50 border-green-500'
-                : decision.advisor.recommendation.action === 'continue'
-                ? 'bg-blue-50 border-blue-500'
-                : decision.advisor.recommendation.action === 'optimize'
-                ? 'bg-yellow-50 border-yellow-500'
-                : 'bg-orange-50 border-orange-500'
-            }`}
-          >
+          <div className={`p-4 md:p-6 rounded-lg shadow border-2 ${
+            decision.advisor.recommendation.action === 'launch'
+              ? 'bg-green-50 border-green-500'
+              : decision.advisor.recommendation.action === 'continue'
+              ? 'bg-blue-50 border-blue-500'
+              : decision.advisor.recommendation.action === 'optimize'
+              ? 'bg-yellow-50 border-yellow-500'
+              : 'bg-orange-50 border-orange-500'
+          }`}>
             <h3 className="text-lg md:text-xl font-bold mb-2">
               {decision.advisor.recommendation.action === 'launch' && '✓ LAUNCH VARIANT B'}
               {decision.advisor.recommendation.action === 'continue' && '⏳ CONTINUE TEST'}
@@ -122,7 +118,7 @@ export function AgentDashboard(props: Props) {
             </div>
             <div className="space-y-2">
               <p className="text-xs md:text-sm font-semibold text-gray-900">Next Steps:</p>
-              {decision.advisor.recommendation.nextSteps.map((step, idx) => (
+              {decision.advisor.recommendation.nextSteps.map((step: string, idx: number) => (
                 <p key={idx} className="text-xs md:text-sm text-gray-700 ml-2">
                   {idx + 1}. {step}
                 </p>
@@ -134,7 +130,7 @@ export function AgentDashboard(props: Props) {
           <div className="bg-white p-4 md:p-6 rounded-lg shadow border border-gray-200">
             <h3 className="text-lg font-bold mb-4">Agent Insights</h3>
             <div className="space-y-3">
-              {decision.advisor.insights.map((insight, idx) => (
+              {decision.advisor.insights.map((insight: any, idx: number) => (
                 <div key={idx} className="p-3 bg-gray-50 rounded border border-gray-200">
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="font-semibold text-sm md:text-base text-gray-900">{insight.title}</h4>
@@ -178,13 +174,11 @@ export function AgentDashboard(props: Props) {
       {/* AUTOMATION AGENT */}
       {activeTab === 'automation' && (
         <div className="space-y-4">
-          <div
-            className={`p-4 md:p-6 rounded-lg shadow border-2 ${
-              decision.automation.shouldAutoLaunch
-                ? 'bg-green-50 border-green-500'
-                : 'bg-gray-50 border-gray-300'
-            }`}
-          >
+          <div className={`p-4 md:p-6 rounded-lg shadow border-2 ${
+            decision.automation.shouldAutoLaunch
+              ? 'bg-green-50 border-green-500'
+              : 'bg-gray-50 border-gray-300'
+          }`}>
             <h3 className="text-xl font-bold mb-3">
               {decision.automation.shouldAutoLaunch ? '🚀 Auto-Launch Enabled' : '⏸️ Auto-Launch Disabled'}
             </h3>
@@ -204,36 +198,17 @@ export function AgentDashboard(props: Props) {
               </div>
             </div>
           </div>
-
-          <div className="bg-white p-4 md:p-6 rounded-lg shadow border border-gray-200">
-            <h3 className="text-lg font-bold mb-4">Automation Details</h3>
-            <div className="space-y-3 text-sm md:text-base">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Auto-Launch Decision:</span>
-                <span className="font-semibold">
-                  {decision.automation.shouldAutoLaunch ? '✓ YES' : '✗ NO'}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Estimated Revenue Impact:</span>
-                <span className="font-semibold text-green-600">
-                  +{decision.automation.estimatedImpact.toFixed(1)}%
-                </span>
-              </div>
-            </div>
-          </div>
         </div>
       )}
 
       {/* INSIGHT MINING AGENT */}
       {activeTab === 'insights' && (
         <div className="space-y-4">
-          {/* Patterns */}
           <div className="bg-blue-50 p-4 md:p-6 rounded-lg shadow border border-blue-200">
             <h3 className="text-lg font-bold mb-3">📊 Patterns Discovered</h3>
             {decision.insights.patterns.length > 0 ? (
               <ul className="space-y-2">
-                {decision.insights.patterns.map((pattern, idx) => (
+                {decision.insights.patterns.map((pattern: string, idx: number) => (
                   <li key={idx} className="text-sm md:text-base text-blue-900 flex gap-2">
                     <span>•</span>
                     <span>{pattern}</span>
@@ -245,12 +220,11 @@ export function AgentDashboard(props: Props) {
             )}
           </div>
 
-          {/* Opportunities */}
           <div className="bg-green-50 p-4 md:p-6 rounded-lg shadow border border-green-200">
             <h3 className="text-lg font-bold mb-3">🎯 Opportunities Identified</h3>
             {decision.insights.opportunities.length > 0 ? (
               <ul className="space-y-2">
-                {decision.insights.opportunities.map((opp, idx) => (
+                {decision.insights.opportunities.map((opp: string, idx: number) => (
                   <li key={idx} className="text-sm md:text-base text-green-900 flex gap-2">
                     <span>→</span>
                     <span>{opp}</span>
@@ -262,12 +236,11 @@ export function AgentDashboard(props: Props) {
             )}
           </div>
 
-          {/* Risks */}
           <div className="bg-red-50 p-4 md:p-6 rounded-lg shadow border border-red-200">
             <h3 className="text-lg font-bold mb-3">⚠️ Risks Detected</h3>
             {decision.insights.risks.length > 0 ? (
               <ul className="space-y-2">
-                {decision.insights.risks.map((risk, idx) => (
+                {decision.insights.risks.map((risk: string, idx: number) => (
                   <li key={idx} className="text-sm md:text-base text-red-900 flex gap-2">
                     <span>!</span>
                     <span>{risk}</span>
@@ -284,11 +257,10 @@ export function AgentDashboard(props: Props) {
       {/* OPTIMIZATION AGENT */}
       {activeTab === 'optimization' && (
         <div className="space-y-4">
-          {/* Suggestions */}
           <div className="bg-white p-4 md:p-6 rounded-lg shadow border border-gray-200">
             <h3 className="text-lg font-bold mb-4">💡 Optimization Suggestions</h3>
             <div className="space-y-3">
-              {decision.optimization.suggestions.map((sugg, idx) => (
+              {decision.optimization.suggestions.map((sugg: string, idx: number) => (
                 <div key={idx} className="p-3 bg-gray-50 rounded border border-gray-200">
                   <p className="text-sm md:text-base text-gray-800">
                     {idx + 1}. {sugg}
@@ -298,7 +270,6 @@ export function AgentDashboard(props: Props) {
             </div>
           </div>
 
-          {/* Predicted Lift */}
           <div className="bg-purple-50 p-4 md:p-6 rounded-lg shadow border border-purple-200">
             <h3 className="text-lg font-bold mb-3">📈 Predicted Lift in Production</h3>
             <div className="text-4xl font-bold text-purple-600 mb-2">
@@ -309,11 +280,10 @@ export function AgentDashboard(props: Props) {
             </p>
           </div>
 
-          {/* Next Experiments */}
           <div className="bg-white p-4 md:p-6 rounded-lg shadow border border-gray-200">
             <h3 className="text-lg font-bold mb-4">🚀 Recommended Next Experiments</h3>
             <div className="space-y-3">
-              {decision.optimization.nextExperimentIdeas.map((idea, idx) => (
+              {decision.optimization.nextExperimentIdeas.map((idea: string, idx: number) => (
                 <div key={idx} className="p-3 bg-orange-50 rounded border border-orange-200">
                   <p className="text-sm md:text-base text-orange-900">
                     {idx + 1}. {idea}
