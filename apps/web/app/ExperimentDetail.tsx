@@ -7,6 +7,7 @@ import { calculateStatistics } from './statisticsEngine';
 import { EventsList } from './EventsList';
 import { ExperimentAdvancedAnalytics } from './ExperimentAdvancedAnalytics';
 import { AgentDashboard } from './AgentDashboard';
+import { RealAgentDashboard } from './RealAgentDashboard';
 
 interface ExperimentData {
   id: string;
@@ -28,7 +29,7 @@ export function ExperimentDetail({ experimentId, onBack }: {
   const [showEditModal, setShowEditModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [stats, setStats] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'agent' | 'advanced' | 'events'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'agent' | 'claude' | 'advanced' | 'events'>('overview');
 
   useEffect(() => {
     fetchExperiment();
@@ -174,6 +175,7 @@ export function ExperimentDetail({ experimentId, onBack }: {
           {[
             { id: 'overview', label: '📊 Overview' },
             { id: 'agent', label: '🤖 AI Agent' },
+            { id: 'claude', label: '✨ Claude AI' },
             { id: 'advanced', label: '🚀 Advanced' },
             { id: 'events', label: '📋 Events' },
           ].map((tab) => (
@@ -321,9 +323,25 @@ export function ExperimentDetail({ experimentId, onBack }: {
         </>
       )}
 
-      {/* AI Agent Tab */}
+      {/* AI Agent Tab (Hybrid) */}
       {activeTab === 'agent' && stats && (
         <AgentDashboard
+          experimentId={experimentId}
+          variantA={experiment.variant_a}
+          variantB={experiment.variant_b}
+          sampleA={2543}
+          convA={512}
+          sampleB={2457}
+          convB={589}
+          pValue={stats.pValue}
+          lift={stats.liftPercentage}
+          daysRunning={7}
+        />
+      )}
+
+      {/* Claude AI Tab (Real) */}
+      {activeTab === 'claude' && stats && (
+        <RealAgentDashboard
           experimentId={experimentId}
           variantA={experiment.variant_a}
           variantB={experiment.variant_b}
