@@ -1,6 +1,6 @@
 /**
  * Real Claude-Powered Agentic AI Engine
- * Uses Anthropic API for true intelligent reasoning
+ * Uses Anthropic API via backend route
  */
 
 interface ExperimentData {
@@ -50,47 +50,24 @@ Please provide:
 Be concise, actionable, and data-driven.`;
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('/api/claude/analyze', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY || '',
-        'anthropic-version': '2023-06-01',
       },
-      body: JSON.stringify({
-        model: 'claude-opus-4-1',
-        max_tokens: 1024,
-        messages: [
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
-      }),
+      body: JSON.stringify({ prompt }),
     });
 
     if (!response.ok) {
       const error = await response.json();
       return {
         success: false,
-        error: error.error?.message || 'API Error',
+        error: error.error || 'API Error',
       };
     }
 
-    const message = await response.json();
-    const textContent = message.content.find((block: any) => block.type === 'text');
-
-    if (textContent) {
-      return {
-        success: true,
-        analysis: textContent.text,
-      };
-    }
-
-    return {
-      success: false,
-      error: 'No response from Claude',
-    };
+    const result = await response.json();
+    return result;
   } catch (error: any) {
     console.error('Claude API error:', error);
     return {
@@ -122,46 +99,26 @@ Experiment: Variant A vs Variant B
 Provide actionable insights that a product team can act on immediately.`;
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('/api/claude/analyze', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY || '',
-        'anthropic-version': '2023-06-01',
       },
-      body: JSON.stringify({
-        model: 'claude-opus-4-1',
-        max_tokens: 1500,
-        messages: [
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
-      }),
+      body: JSON.stringify({ prompt }),
     });
 
     if (!response.ok) {
       const error = await response.json();
       return {
         success: false,
-        error: error.error?.message || 'API Error',
+        error: error.error || 'API Error',
       };
     }
 
-    const message = await response.json();
-    const textContent = message.content.find((block: any) => block.type === 'text');
-
-    if (textContent) {
-      return {
-        success: true,
-        insights: textContent.text,
-      };
-    }
-
+    const result = await response.json();
     return {
-      success: false,
-      error: 'No response from Claude',
+      success: result.success,
+      insights: result.analysis,
     };
   } catch (error: any) {
     console.error('Claude API error:', error);

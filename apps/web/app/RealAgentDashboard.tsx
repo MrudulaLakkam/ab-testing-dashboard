@@ -79,13 +79,11 @@ export function RealAgentDashboard(props: Props) {
 
   return (
     <div className="space-y-6">
-      {/* Agent Header */}
       <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold mb-2">🤖 Claude AI Agent Analysis</h2>
         <p className="text-blue-100">Powered by Claude Opus - Real AI reasoning</p>
       </div>
 
-      {/* Tab Navigation */}
       <div className="bg-white p-4 rounded-lg shadow border border-gray-200 overflow-x-auto">
         <div className="flex gap-2 whitespace-nowrap">
           {[
@@ -107,7 +105,6 @@ export function RealAgentDashboard(props: Props) {
         </div>
       </div>
 
-      {/* Analysis Tab */}
       {activeTab === 'analysis' && analysis && (
         <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
           <div className="text-gray-700 whitespace-pre-wrap font-mono text-sm leading-relaxed">
@@ -116,7 +113,6 @@ export function RealAgentDashboard(props: Props) {
         </div>
       )}
 
-      {/* Deep Insights Tab */}
       {activeTab === 'insights' && insights && (
         <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
           <div className="text-gray-700 whitespace-pre-wrap font-mono text-sm leading-relaxed">
@@ -125,7 +121,6 @@ export function RealAgentDashboard(props: Props) {
         </div>
       )}
 
-      {/* Refresh Button */}
       <button
         onClick={loadClaudeAnalysis}
         className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition"
