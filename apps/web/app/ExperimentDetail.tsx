@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import { EditExperimentModal } from './EditExperimentModal';
+import { AddEventsModal } from './AddEventsModal';
 import { calculateStatistics } from './statisticsEngine';
 import { EventsList } from './EventsList';
 import { ExperimentAdvancedAnalytics } from './ExperimentAdvancedAnalytics';
@@ -27,6 +28,7 @@ export function ExperimentDetail({ experimentId, onBack }: {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showAddEventsModal, setShowAddEventsModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [stats, setStats] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'agent' | 'claude' | 'advanced' | 'events'>('overview');
@@ -132,7 +134,13 @@ export function ExperimentDetail({ experimentId, onBack }: {
             <h1 className="text-2xl md:text-4xl font-bold text-gray-900 break-words">{experiment.name}</h1>
           </div>
           
-          <div className="flex gap-2 w-full md:w-auto">
+          <div className="flex gap-2 w-full md:w-auto flex-wrap">
+            <button
+              onClick={() => setShowAddEventsModal(true)}
+              className="flex-1 md:flex-none px-3 md:px-4 py-2 text-sm md:text-base bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold transition"
+            >
+              ➕ Add Events
+            </button>
             <button
               onClick={() => setShowEditModal(true)}
               className="flex-1 md:flex-none px-3 md:px-4 py-2 text-sm md:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition"
@@ -323,7 +331,7 @@ export function ExperimentDetail({ experimentId, onBack }: {
         </>
       )}
 
-      {/* AI Agent Tab (Hybrid) */}
+      {/* AI Agent Tab */}
       {activeTab === 'agent' && stats && (
         <AgentDashboard
           experimentId={experimentId}
@@ -339,7 +347,7 @@ export function ExperimentDetail({ experimentId, onBack }: {
         />
       )}
 
-      {/* Claude AI Tab (Real) */}
+      {/* Claude AI Tab */}
       {activeTab === 'claude' && stats && (
         <RealAgentDashboard
           experimentId={experimentId}
@@ -375,6 +383,17 @@ export function ExperimentDetail({ experimentId, onBack }: {
           experiment={experiment}
           onClose={() => setShowEditModal(false)}
           onUpdate={fetchExperiment}
+        />
+      )}
+
+      {/* Add Events Modal */}
+      {showAddEventsModal && experiment && (
+        <AddEventsModal
+          experimentId={experimentId}
+          variantA={experiment.variant_a}
+          variantB={experiment.variant_b}
+          onClose={() => setShowAddEventsModal(false)}
+          onSuccess={fetchExperiment}
         />
       )}
     </div>
