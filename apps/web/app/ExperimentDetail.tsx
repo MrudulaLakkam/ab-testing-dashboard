@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import { EditExperimentModal } from './EditExperimentModal';
-import { AddEventsModal } from './AddEventsModal';
+import { EventRecorderModal } from './EventRecorderModal';
 import { calculateStatistics } from './statisticsEngine';
 import { EventsList } from './EventsList';
 import { ExperimentAdvancedAnalytics } from './ExperimentAdvancedAnalytics';
@@ -139,7 +139,7 @@ export function ExperimentDetail({ experimentId, onBack }: {
               onClick={() => setShowAddEventsModal(true)}
               className="flex-1 md:flex-none px-3 md:px-4 py-2 text-sm md:text-base bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold transition"
             >
-              ➕ Add Events
+              📊 Record Events
             </button>
             <button
               onClick={() => setShowEditModal(true)}
@@ -386,9 +386,9 @@ export function ExperimentDetail({ experimentId, onBack }: {
         />
       )}
 
-      {/* Add Events Modal */}
+      {/* Event Recorder Modal */}
       {showAddEventsModal && experiment && (
-        <AddEventsModal
+        <EventRecorderModal
           experimentId={experimentId}
           variantA={experiment.variant_a}
           variantB={experiment.variant_b}
