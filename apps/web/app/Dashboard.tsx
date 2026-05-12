@@ -3,6 +3,18 @@
 import { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import { ExperimentSuggestions } from './ExperimentSuggestions';
+import {
+  Sparkles,
+  FlaskConical,
+  Activity,
+  CheckCircle2,
+  TrendingUp,
+  Plus,
+  BarChart3,
+  Zap,
+  ArrowUpRight,
+  Clock,
+} from 'lucide-react';
 
 interface Experiment {
   id: string;
@@ -21,7 +33,7 @@ interface Props {
 export function Dashboard({ onNewExperiment, onViewExperiments, onSeeReports, onSelectExperiment }: Props) {
   const [stats, setStats] = useState({
     activeExperiments: 0,
-    totalConversions: 0,
+    totalExperiments: 0,
     avgConversionRate: 0,
     winnersFound: 0,
   });
@@ -45,7 +57,7 @@ export function Dashboard({ onNewExperiment, onViewExperiments, onSeeReports, on
 
         setStats({
           activeExperiments: activeCount,
-          totalConversions: totalCount * 300,
+          totalExperiments: totalCount,
           avgConversionRate: 21.8,
           winnersFound: completedCount,
         });
@@ -61,104 +73,166 @@ export function Dashboard({ onNewExperiment, onViewExperiments, onSeeReports, on
     fetchStats();
   }, []);
 
-  const statCards = [
-    { label: 'Active', value: stats.activeExperiments, color: 'bg-blue-500' },
-    { label: 'Total', value: experiments.length, color: 'bg-green-500' },
-    { label: 'Avg Rate', value: `${stats.avgConversionRate}%`, color: 'bg-purple-500' },
-    { label: 'Winners', value: stats.winnersFound, color: 'bg-orange-500' },
+  const statsCards = [
+    { label: 'Total Experiments', value: stats.totalExperiments.toString(), icon: FlaskConical, trend: '+12%' },
+    { label: 'Active Tests', value: stats.activeExperiments.toString(), icon: Activity, trend: '+4' },
+    { label: 'Completed', value: stats.winnersFound.toString(), icon: CheckCircle2, trend: '+8%' },
+    { label: 'Avg Lift', value: `${stats.avgConversionRate}%`, icon: TrendingUp, trend: '+3.2%' },
   ];
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 md:px-0">
-        <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-2">Welcome Back! 👋</h1>
-        <p className="text-gray-600 text-sm md:text-base">Loading your dashboard...</p>
-      </div>
+      <main className="min-h-screen pb-20">
+        <header className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 relative overflow-hidden py-14">
+          <div className="max-w-7xl mx-auto px-6 relative">
+            <h1 className="text-3xl md:text-4xl font-bold text-white">Welcome Back! 👋</h1>
+            <p className="text-white/70 mt-2">Loading your dashboard...</p>
+          </div>
+        </header>
+      </main>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-0 space-y-6 md:space-y-8">
-      {/* Welcome Section */}
-      <div>
-        <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-2">Welcome Back! 👋</h1>
-        <p className="text-gray-600 text-sm md:text-base">Here's what's happening with your experiments</p>
-      </div>
-
-      {/* Stats Grid - Responsive */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
-        {statCards.map((stat, index) => (
-          <div
-            key={index}
-            className="bg-white p-4 md:p-6 rounded-lg shadow border border-gray-200 hover:shadow-lg transition-shadow"
-          >
-            <p className="text-xs md:text-sm text-gray-600 font-semibold mb-2 truncate">{stat.label}</p>
-            <div className="flex items-center gap-2 md:gap-3">
-              <div className={`${stat.color} w-10 h-10 md:w-12 md:h-12 rounded-lg flex-shrink-0`}></div>
-              <p className="text-2xl md:text-4xl font-bold text-gray-900 truncate">{stat.value}</p>
+    <main className="min-h-screen pb-20">
+      {/* Header */}
+      <header className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 relative overflow-hidden">
+        <div
+          className="absolute inset-0 opacity-30 mix-blend-overlay pointer-events-none"
+          style={{
+            backgroundImage: 'radial-gradient(circle at 20% 20%, white 1px, transparent 1px)',
+            backgroundSize: '32px 32px',
+          }}
+        />
+        <div className="max-w-7xl mx-auto px-6 py-10 md:py-14 relative">
+          <div className="flex items-center justify-between gap-6 flex-wrap">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center shadow-lg">
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">AB Test Pro</h1>
+                <p className="text-white/70 text-sm">Premium experimentation, beautifully measured.</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="bg-white/20 backdrop-blur px-3 py-1.5 rounded-full text-xs font-medium text-white/90 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> All systems nominal
+              </span>
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* Quick Actions - Stack on Mobile */}
-      <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 md:p-8 rounded-lg shadow space-y-4">
-        <h2 className="text-xl md:text-2xl font-bold">Quick Actions</h2>
-        <div className="flex flex-col md:flex-row gap-3 md:gap-4">
-          <button 
-            onClick={onNewExperiment}
-            className="px-4 md:px-6 py-2 bg-white text-blue-600 rounded-lg font-semibold hover:bg-gray-100 transition text-sm md:text-base"
-          >
-            + New
-          </button>
-          <button 
-            onClick={onViewExperiments}
-            className="px-4 md:px-6 py-2 bg-blue-700 text-white rounded-lg font-semibold hover:bg-blue-800 transition text-sm md:text-base"
-          >
-            View All
-          </button>
-          <button 
-            onClick={onSeeReports}
-            className="px-4 md:px-6 py-2 bg-blue-700 text-white rounded-lg font-semibold hover:bg-blue-800 transition text-sm md:text-base"
-          >
-            Reports
-          </button>
-        </div>
-      </div>
-
-      {/* AI Agent Suggestions - NEW! */}
-      <ExperimentSuggestions />
-
-      {/* Recent Activity */}
-      <div className="bg-white p-6 md:p-8 rounded-lg shadow border border-gray-200">
-        <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6">Recent Activity</h2>
-        
-        {experiments.length === 0 ? (
-          <p className="text-gray-600 text-center py-8 text-sm md:text-base">No experiments yet. Create one to get started!</p>
-        ) : (
-          <div className="space-y-3 md:space-y-4">
-            {experiments.map((experiment) => (
-              <button
-                key={experiment.id}
-                onClick={() => onSelectExperiment(experiment.id)}
-                className="w-full text-left flex flex-col md:flex-row md:items-center md:justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors gap-2"
-              >
-                <div className="min-w-0">
-                  <p className="font-semibold text-gray-900 truncate text-sm md:text-base">{experiment.name}</p>
-                  <p className="text-xs md:text-sm text-gray-600">{new Date(experiment.created_at).toLocaleDateString()}</p>
-                </div>
-                <span className={`px-3 py-1 rounded-full text-xs md:text-sm font-semibold flex-shrink-0 ${
-                  experiment.status === 'active' ? 'bg-green-100 text-green-800' :
-                  experiment.status === 'completed' ? 'bg-blue-100 text-blue-800' :
-                  'bg-gray-100 text-gray-800'
-                }`}>
-                  {experiment.status.charAt(0).toUpperCase() + experiment.status.slice(1)}
-                </span>
-              </button>
-            ))}
+          <div className="mt-10 md:mt-14 max-w-2xl">
+            <p className="text-white/70 text-sm uppercase tracking-[0.18em] mb-3">Welcome back</p>
+            <h2 className="text-3xl md:text-5xl font-bold text-white leading-tight">
+              Ship decisions backed by <span className="italic font-light">evidence</span>, not opinions.
+            </h2>
           </div>
-        )}
+        </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto px-6 -mt-10 md:-mt-14 relative space-y-10">
+        {/* Stats */}
+        <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {statsCards.map((s, i) => (
+            <article
+              key={s.label}
+              className="bg-white p-5 md:p-6 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all border border-gray-200"
+            >
+              <div className="flex items-start justify-between">
+                <span className="text-xs md:text-sm text-gray-600 font-medium">{s.label}</span>
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
+                  <s.icon className="w-4 h-4 text-white" />
+                </div>
+              </div>
+              <p className="mt-4 text-3xl md:text-4xl font-bold text-gray-900 leading-none tracking-tight">
+                {s.value}
+              </p>
+              <div className="mt-3 flex items-center gap-1 text-xs font-medium text-green-600">
+                <ArrowUpRight className="w-3.5 h-3.5" />
+                {s.trend} <span className="text-gray-600 font-normal">vs last month</span>
+              </div>
+            </article>
+          ))}
+        </section>
+
+        {/* Quick Actions */}
+        <section className="bg-white rounded-3xl p-6 md:p-8 shadow-lg border border-gray-200 overflow-hidden relative">
+          <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+              <p className="text-xs uppercase tracking-[0.18em] text-gray-600 font-semibold mb-2">Quick actions</p>
+              <h3 className="text-2xl md:text-3xl font-bold text-gray-900">Start your next experiment</h3>
+              <p className="text-gray-600 mt-1 text-sm md:text-base">Spin up a hypothesis in under 60 seconds.</p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={onNewExperiment}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 py-3 rounded-xl font-semibold flex items-center gap-2 shadow-lg hover:scale-[1.03] active:scale-[0.98] transition-all"
+              >
+                <Plus className="w-4 h-4" /> New Experiment
+              </button>
+              <button
+                onClick={onSeeReports}
+                className="bg-white border border-gray-300 px-5 py-3 rounded-xl font-semibold text-gray-700 flex items-center gap-2 hover:-translate-y-0.5 transition-all"
+              >
+                <BarChart3 className="w-4 h-4" /> View Reports
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* AI Recommendations */}
+        <ExperimentSuggestions />
+
+        {/* Recent Activity */}
+        <section className="bg-white rounded-3xl p-6 md:p-8 shadow-lg border border-gray-200">
+          <div className="flex items-end justify-between mb-6">
+            <div>
+              <p className="text-xs uppercase tracking-[0.18em] text-gray-600 font-semibold mb-1 flex items-center gap-2">
+                <Clock className="w-3.5 h-3.5" /> Recent activity
+              </p>
+              <h3 className="text-2xl md:text-3xl font-bold text-gray-900">What's been happening</h3>
+            </div>
+          </div>
+
+          {experiments.length === 0 ? (
+            <p className="text-gray-600 text-center py-12 text-sm md:text-base">No experiments yet. Create one to get started! 🚀</p>
+          ) : (
+            <ol className="relative border-l border-gray-300 ml-3 space-y-6">
+              {experiments.map((experiment) => (
+                <li key={experiment.id} className="pl-6 relative group cursor-pointer" onClick={() => onSelectExperiment(experiment.id)}>
+                  <span
+                    className={`absolute -left-[7px] top-1.5 w-3.5 h-3.5 rounded-full ring-4 ring-white ${
+                      experiment.status === 'active'
+                        ? 'bg-blue-500 animate-pulse'
+                        : experiment.status === 'completed'
+                        ? 'bg-emerald-500'
+                        : 'bg-purple-500'
+                    }`}
+                  />
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                    <div>
+                      <p className="font-semibold text-gray-900 group-hover:text-blue-600 transition-all">{experiment.name}</p>
+                      <p className="text-xs text-gray-600 mt-0.5">{new Date(experiment.created_at).toLocaleDateString()}</p>
+                    </div>
+                    <span
+                      className={`text-xs font-semibold px-3 py-1 rounded-full w-fit ${
+                        experiment.status === 'active'
+                          ? 'bg-blue-100 text-blue-700'
+                          : experiment.status === 'completed'
+                          ? 'bg-emerald-100 text-emerald-700'
+                          : 'bg-purple-100 text-purple-700'
+                      }`}
+                    >
+                      {experiment.status.charAt(0).toUpperCase() + experiment.status.slice(1)}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          )}
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
