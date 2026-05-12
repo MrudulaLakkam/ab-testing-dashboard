@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from './supabaseClient';
-import { suggestNewExperiments, generateExperimentRoadmap } from './experimentSuggestionAgent';
+import { generateExperimentRoadmap } from './experimentSuggestionAgent';
+import { Zap, Lightbulb, ArrowUpRight } from 'lucide-react';
 
 interface Experiment {
   name: string;
@@ -15,7 +15,7 @@ interface Experiment {
 export function ExperimentSuggestions() {
   const [roadmap, setRoadmap] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     loadSuggestions();
@@ -23,7 +23,6 @@ export function ExperimentSuggestions() {
 
   const loadSuggestions = async () => {
     try {
-      // Mock experiment data for demo
       const mockExperiments: Experiment[] = [
         {
           name: 'Button Color Test',
@@ -58,120 +57,100 @@ export function ExperimentSuggestions() {
   };
 
   if (loading) {
-    return <div className="text-center py-4 text-sm md:text-base">🤖 Agent analyzing experiments...</div>;
+    return (
+      <section className="text-center py-12">
+        <p className="text-gray-600">🤖 Agent analyzing experiments...</p>
+      </section>
+    );
   }
 
   if (!roadmap) {
     return null;
   }
 
+  const displayedSuggestions = showAll ? roadmap.suggestions : roadmap.suggestions.slice(0, 3);
+
   return (
-    <div className="bg-gradient-to-br from-purple-50 to-blue-50 p-4 md:p-6 rounded-lg shadow border border-purple-200 space-y-4">
-      {/* Header */}
-      <div className="flex items-start gap-3">
-        <span className="text-2xl md:text-3xl flex-shrink-0">🚀</span>
-        <div className="flex-1 min-w-0">
-          <h3 className="text-lg md:text-xl font-bold text-gray-900">Experiment Agent Recommendations</h3>
-          <p className="text-xs md:text-sm text-gray-600 mt-1">{roadmap.summary}</p>
+    <section>
+      <div className="flex items-end justify-between mb-5">
+        <div>
+          <p className="text-xs uppercase tracking-[0.18em] text-gray-600 font-semibold mb-1 flex items-center gap-2">
+            <Zap className="w-3.5 h-3.5" /> AI Recommendations
+          </p>
+          <h3 className="text-2xl md:text-3xl font-bold text-gray-900">Tests we'd run next</h3>
         </div>
-      </div>
-
-      {/* Estimated Monthly Lift */}
-      <div className="bg-white p-3 md:p-4 rounded-lg border border-purple-200">
-        <p className="text-xs md:text-sm text-gray-600 mb-1">Potential Monthly Lift</p>
-        <p className="text-2xl md:text-3xl font-bold text-purple-600">
-          +{roadmap.estimatedMonthlyLift}%
-        </p>
-        <p className="text-xs text-gray-500 mt-1">From top 3 recommendations</p>
-      </div>
-
-      {/* Suggestions */}
-      <div className="space-y-2">
-        {roadmap.suggestions.map((suggestion: any, idx: number) => (
-          <div
-            key={idx}
-            className={`border rounded-lg transition-all cursor-pointer ${
-              expandedIndex === idx
-                ? 'bg-white border-purple-300 shadow-md'
-                : 'bg-white/50 border-purple-100 hover:bg-white'
-            }`}
+        {!showAll && roadmap.suggestions.length > 3 && (
+          <button
+            onClick={() => setShowAll(true)}
+            className="text-sm font-medium text-blue-600 hover:underline hidden md:inline-flex items-center gap-1"
           >
-            <button
-              onClick={() => setExpandedIndex(expandedIndex === idx ? null : idx)}
-              className="w-full p-3 md:p-4 text-left"
-            >
-              <div className="flex items-start justify-between gap-2 md:gap-3">
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-gray-900 text-sm md:text-base mb-1">
-                    {idx + 1}. {suggestion.title}
-                  </h4>
-                  <p className="text-xs md:text-sm text-gray-600 line-clamp-2">{suggestion.description}</p>
-                </div>
-                <div className="flex-shrink-0 text-right">
-                  <div className="text-lg md:text-xl font-bold text-green-600 mb-1 whitespace-nowrap">
-                    +{suggestion.expectedLift}%
-                  </div>
-                  <span
-                    className={`inline-block px-2 py-1 rounded text-xs font-semibold whitespace-nowrap ${
-                      suggestion.difficulty === 'easy'
-                        ? 'bg-green-100 text-green-800'
-                        : suggestion.difficulty === 'medium'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}
-                  >
-                    {suggestion.difficulty}
-                  </span>
-                </div>
+            View all <ArrowUpRight className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-4">
+        {displayedSuggestions.map((s: any, i: number) => (
+          <article
+            key={s.title}
+            className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all border border-gray-200 flex flex-col"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
+                <Lightbulb className="w-5 h-5 text-white" />
               </div>
-            </button>
+              <span
+                className={`text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded-full ${
+                  s.difficulty === 'easy'
+                    ? 'bg-green-100 text-green-800'
+                    : s.difficulty === 'medium'
+                    ? 'bg-amber-100 text-amber-700'
+                    : 'bg-red-100 text-red-800'
+                }`}
+              >
+                {s.difficulty === 'easy' ? 'High Impact' : s.difficulty === 'medium' ? 'Medium Impact' : 'Low Impact'}
+              </span>
+            </div>
 
-            {/* Expanded Details */}
-            {expandedIndex === idx && (
-              <div className="border-t border-gray-200 p-3 md:p-4 bg-gray-50 space-y-3">
-                <div>
-                  <p className="text-xs font-semibold text-gray-700 mb-1">Hypothesis</p>
-                  <p className="text-xs md:text-sm text-gray-700">{suggestion.hypothesis}</p>
-                </div>
+            <h4 className="font-semibold text-gray-900 text-lg leading-snug">{s.title}</h4>
+            <p className="text-sm text-gray-600 mt-2 flex-1">{s.description}</p>
 
-                {/* Metrics Grid - Better Mobile Layout */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-white p-3 rounded border border-gray-200">
-                    <p className="text-xs font-semibold text-gray-700 mb-1">Expected Lift</p>
-                    <p className="text-lg md:text-xl font-bold text-green-600">+{suggestion.expectedLift}%</p>
-                  </div>
-                  <div className="bg-white p-3 rounded border border-gray-200">
-                    <p className="text-xs font-semibold text-gray-700 mb-1">Time to Run</p>
-                    <p className="text-lg md:text-xl font-bold text-blue-600 break-words">{suggestion.timeToRun}</p>
-                  </div>
-                </div>
-
-                <div>
-                  <p className="text-xs font-semibold text-gray-700 mb-1">Why This Matters</p>
-                  <p className="text-xs md:text-sm text-gray-700">{suggestion.reason}</p>
-                </div>
-
-                <button className="w-full px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold text-xs md:text-sm transition">
-                  Create This Experiment
-                </button>
+            {/* AI Confidence Bar */}
+            <div className="mt-5">
+              <div className="flex items-center justify-between text-xs text-gray-600 mb-1.5">
+                <span>AI confidence</span>
+                <span className="font-semibold text-gray-900">92%</span>
               </div>
-            )}
-          </div>
+              <div className="h-1.5 rounded-full bg-gray-200 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-blue-600 to-purple-600 transition-all"
+                  style={{ width: '92%' }}
+                />
+              </div>
+            </div>
+          </article>
         ))}
       </div>
 
-      {/* Next Steps */}
-      <div className="bg-white p-3 md:p-4 rounded-lg border border-purple-200">
-        <p className="text-xs font-semibold text-gray-700 mb-2">Recommended Next Steps</p>
-        <ul className="space-y-1">
-          {roadmap.nextSteps.map((step: string, idx: number) => (
-            <li key={idx} className="text-xs md:text-sm text-gray-700 flex gap-2">
-              <span className="font-semibold flex-shrink-0">{step.split('.')[0]}.</span>
-              <span className="break-words">{step.split('.')[1]}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
+      {/* Mobile View All Button */}
+      {!showAll && roadmap.suggestions.length > 3 && (
+        <button
+          onClick={() => setShowAll(true)}
+          className="w-full mt-6 md:hidden px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg font-semibold text-sm transition-all"
+        >
+          View all {roadmap.suggestions.length} recommendations
+        </button>
+      )}
+
+      {/* Close All Button (when expanded) */}
+      {showAll && roadmap.suggestions.length > 3 && (
+        <button
+          onClick={() => setShowAll(false)}
+          className="w-full mt-6 px-4 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-semibold text-sm transition-all"
+        >
+          Show less
+        </button>
+      )}
+    </section>
   );
 }
