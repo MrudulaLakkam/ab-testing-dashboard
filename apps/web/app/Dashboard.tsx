@@ -115,11 +115,6 @@ export function Dashboard({ onNewExperiment, onViewExperiments, onSeeReports, on
                 <p className="text-white/70 text-sm">Premium experimentation, beautifully measured.</p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="bg-white/20 backdrop-blur px-3 py-1.5 rounded-full text-xs font-medium text-white/90 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> All systems nominal
-              </span>
-            </div>
           </div>
 
           <div className="mt-10 md:mt-14 max-w-2xl">

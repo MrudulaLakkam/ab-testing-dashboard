@@ -4,15 +4,27 @@ import { useState } from 'react';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 import { Dashboard } from './Dashboard';
-import { ExperimentForm } from './ExperimentForm';
 import { ExperimentsList } from './ExperimentsList';
+import { ExperimentForm } from './ExperimentForm';
 import { ExperimentDetail } from './ExperimentDetail';
 import { Analytics } from './Analytics';
 
-function HomePage() {
+export default function Home() {
   const [currentPage, setCurrentPage] = useState('dashboard');
-  const [selectedExperimentId, setSelectedExperimentId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [selectedExperimentId, setSelectedExperimentId] = useState<string | null>(null);
+
+  const handleNewExperiment = () => {
+    setCurrentPage('create');
+  };
+
+  const handleViewExperiments = () => {
+    setCurrentPage('experiments');
+  };
+
+  const handleSeeReports = () => {
+    setCurrentPage('analytics');
+  };
 
   const handleSelectExperiment = (id: string) => {
     setSelectedExperimentId(id);
@@ -20,64 +32,66 @@ function HomePage() {
   };
 
   const handleBackFromDetail = () => {
+    setSelectedExperimentId(null);
+    setCurrentPage('experiments');
+  };
+
+  const handleCreateExperiment = () => {
     setCurrentPage('experiments');
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
-      {/* Header - Mobile Only */}
-      <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      {/* Header with Navigation */}
+      <Header 
+        onMenuClick={() => setSidebarOpen(!sidebarOpen)}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+      />
 
-      {/* Main Content Area */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
-        <Sidebar 
-          currentPage={currentPage} 
-          setCurrentPage={setCurrentPage}
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-        />
+      {/* Mobile Menu Dropdown */}
+      <Sidebar
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
-        {/* Main Content */}
-        <main className="flex-1 overflow-auto w-full">
-          <div className="p-4 md:p-8">
-            {currentPage === 'dashboard' && (
-              <Dashboard 
-                onNewExperiment={() => setCurrentPage('create')}
-                onViewExperiments={() => setCurrentPage('experiments')}
-                onSeeReports={() => setCurrentPage('analytics')}
-                onSelectExperiment={handleSelectExperiment}
-              />
-            )}
-            
-            {currentPage === 'create' && <ExperimentForm />}
-            
-            {currentPage === 'experiments' && (
-              <ExperimentsList onSelectExperiment={handleSelectExperiment} />
-            )}
-            
-            {currentPage === 'detail' && selectedExperimentId && (
-              <ExperimentDetail
-                experimentId={selectedExperimentId}
-                onBack={handleBackFromDetail}
-              />
-            )}
-            
-            {currentPage === 'analytics' && <Analytics />}
+      {/* Main Content */}
+      <main className="flex-1 overflow-y-auto">
+        {currentPage === 'dashboard' && (
+          <Dashboard
+            onNewExperiment={handleNewExperiment}
+            onViewExperiments={handleViewExperiments}
+            onSeeReports={handleSeeReports}
+            onSelectExperiment={handleSelectExperiment}
+          />
+        )}
 
-            {currentPage === 'settings' && (
-              <div className="max-w-4xl">
-                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Settings</h1>
-                <div className="bg-white p-6 md:p-8 rounded-lg shadow border border-gray-200">
-                  <p className="text-gray-600 text-lg">Settings page coming soon...</p>
-                </div>
-              </div>
-            )}
+        {currentPage === 'experiments' && (
+          <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
+            <ExperimentsList onSelectExperiment={handleSelectExperiment} />
           </div>
-        </main>
-      </div>
+        )}
+
+        {currentPage === 'create' && (
+          <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
+            <ExperimentForm />
+          </div>
+        )}
+
+        {currentPage === 'detail' && selectedExperimentId && (
+          <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
+            <ExperimentDetail experimentId={selectedExperimentId} onBack={handleBackFromDetail} />
+          </div>
+        )}
+
+        {currentPage === 'analytics' && (
+          <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
+            <Analytics />
+          </div>
+        )}
+      </main>
     </div>
   );
 }
-
-export default HomePage;
